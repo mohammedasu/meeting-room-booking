@@ -1,33 +1,39 @@
 <template>
     <div class="max-w-md mx-auto mt-8">
-      <form @submit.prevent="register" class="space-y-4">
+      <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
+      <form @submit.prevent="onSubmit" class="space-y-4">
         <input
           v-model="name"
           type="text"
           placeholder="Full Name"
           class="w-full px-4 py-2 border rounded"
-          required
+          @blur="validateField('name')"
+          :class="{ 'border-red-500': errors.name }"
         />
+        <span v-if="errors.name" class="text-red-500 text-sm">{{ errors.name }}</span>
         <input
           v-model="email"
           type="email"
           placeholder="Email"
           class="w-full px-4 py-2 border rounded"
-          required
+          @blur="validateField('email')"
+          :class="{ 'border-red-500': errors.email }"
         />
+        <span v-if="errors.email" class="text-red-500 text-sm">{{ errors.email }}</span>
         <input
           v-model="password"
           type="password"
           placeholder="Password"
           class="w-full px-4 py-2 border rounded"
-          required
+          @blur="validateField('password')"
+          :class="{ 'border-red-500': errors.password }"
         />
+        <span v-if="errors.password" class="text-red-500 text-sm">{{ errors.password }}</span>
         <input
           v-model="password_confirmation"
           type="password"
           placeholder="Confirm Password"
           class="w-full px-4 py-2 border rounded"
-          required
         />
         <button
           type="submit"
@@ -44,42 +50,38 @@
             Login here
           </router-link>
       </p>
-  
-      <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
     </div>
   </template>
   
   <script setup>
   import { ref } from 'vue';
-  import axios from 'axios';
   import { useRouter } from 'vue-router';
+  import { registerSchema } from '@/utils/validation';
+  import { useForm } from 'vee-validate';
 
-    const name = ref('');
-    const email = ref('');
-    const password = ref('');
-    const password_confirmation = ref('');
+    const { defineField, handleSubmit, errors, validateField } = useForm({
+      validationSchema: registerSchema,
+    });
+
+    const [name] = defineField('name');
+    const [email] = defineField('email');
+    const [password] = defineField('password');
+    const [password_confirmation] = defineField('password_confirmation');
+
     const errorMessage = ref('');
     const disabled = ref(false);
     const router = useRouter();
 
-    const register = async () => {
-        try {
-            disabled.value = true;
-            const response = await axios.post('/api/register', {
-              name: name.value,
-              email: email.value,
-              password: password.value,
-              password_confirmation: password_confirmation.value
-            });
-            disabled.value = false;
-            alert(response.data.message);
-            router.push('/');
-            console.log('Registration successful', response.data);
-            // Redirect or show a success message
-        } catch (error) {
-            disabled.value = false;
-            errorMessage.value = error.response?.data?.message || 'An error occurred.';
-        }
-    };
+    const onSubmit = handleSubmit(async (values) => {
+
+      await axios.post('/api/register', values).then((response) => {
+        disabled.value = false;
+        alert(response.data.message);
+        router.push('/');
+      }).catch((error) => {
+        disabled.value = false;
+        errorMessage.value = error.response?.data?.message || 'An error occurred.';
+      });
+  });
   </script>
   

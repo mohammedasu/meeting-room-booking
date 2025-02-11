@@ -19,7 +19,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import Sidebar from './Sidebar.vue';
 
 const subscriptions = ref([]);

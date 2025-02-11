@@ -7,7 +7,7 @@ import MyBooking from '../components/MyBooking.vue';
 
 const routes = [
   { path: '/', name: 'login', component: Login, meta: { requiresGuest: true } },
-  { path: '/register', component: Register, meta: { requiresGuest: true } },
+  { path: '/register', name: 'register', component: Register, meta: { requiresGuest: true } },
   { path: '/subscribe', component: Subscription, meta: { requiresAuth: true } },
   { path: '/booking', component: BookingForm, meta: { requiresAuth: true } },
   { path: '/my-booking', component: MyBooking, meta: { requiresAuth: true } },
@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
     } else if (to.meta.requiresAuth && isAuthenticated) {
       next();
     } else {
-      if (to.name === 'login') 
+      if (to.name === 'login' || to.name === 'register') 
         return next();
       next('/');
     }

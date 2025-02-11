@@ -78,7 +78,6 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import axios from 'axios';
 import { useForm } from 'vee-validate';
 import { bookingSchema } from '@/utils/validation';
 import Sidebar from './Sidebar.vue';
